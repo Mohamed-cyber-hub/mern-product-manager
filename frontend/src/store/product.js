@@ -1,19 +1,21 @@
 // store/product.js
 import { create } from 'zustand';
 
+// Get the backend base URL from .env
+const BASE_URL = import.meta.env.VITE_API_BASE_URL;
+
 export const useProductStore = create((set) => ({
     products: [],
 
     setProducts: (products) => set({ products }),
 
     createProduct: async (newProduct) => {
-        // Validate required fields
         if (!newProduct.name || !newProduct.price || !newProduct.image) {
             return { success: false, message: 'All fields are required.' };
         }
 
         try {
-            const response = await fetch('/api/products', {
+            const response = await fetch(`${BASE_URL}/products`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
@@ -30,7 +32,6 @@ export const useProductStore = create((set) => ({
                 };
             }
 
-            // Update store state
             set((state) => ({
                 products: [...state.products, data.data],
             }));
@@ -47,90 +48,90 @@ export const useProductStore = create((set) => ({
             };
         }
     },
-    
+
     fetchProducts: async () => {
         try {
-            const res = await fetch("/api/products");
+            const res = await fetch(`${BASE_URL}/products`);
             const data = await res.json();
-    
-            // Log the data to verify its structure
+
             console.log('Fetched products:', data);
-    
-            // If response is an object with a `products` array
+
             if (Array.isArray(data.products)) {
                 set({ products: data.products });
-            } 
-            // If response is already an array
-            else if (Array.isArray(data)) {
+            } else if (Array.isArray(data)) {
                 set({ products: data });
-            } 
-            // Unexpected structure
-            else {
+            } else {
                 console.warn("Unexpected response structure:", data);
-                set({ products: [] }); // fallback
+                set({ products: [] });
             }
         } catch (error) {
             console.error("Failed to fetch products:", error);
-            set({ products: [] }); // fallback on error
+            set({ products: [] });
         }
     },
-    
 
     deleteProduct: async (pid) => {
-        const res = await fetch(`/api/products/${pid}`, {
+        const res = await fetch(`${BASE_URL}/products/${pid}`, {
             method: 'DELETE',
         });
 
         const data = await res.json();
 
-        if (!data.success) return { success: false, message: data.message || 'Failed to delete product.' };
+        if (!data.success) {
+            return {
+                success: false,
+                message: data.message || 'Failed to delete product.',
+            };
+        }
 
         set((state) => ({
             products: state.products.filter((product) => product._id !== pid),
         }));
 
-        return { success: true, message: 'Product deleted successfully!' };
+        return {
+            success: true,
+            message: 'Product deleted successfully!',
+        };
     },
 
     updateProduct: async (pid, updatedProduct) => {
         try {
-            const res = await fetch(`/api/products/${pid}`, {
-                method: "PUT",
+            const res = await fetch(`${BASE_URL}/products/${pid}`, {
+                method: 'PUT',
                 headers: {
-                    "Content-Type": "application/json",
+                    'Content-Type': 'application/json',
                 },
                 body: JSON.stringify(updatedProduct),
             });
-            
+
             const data = await res.json();
             console.log('API Response:', data);
-            
+
             if (!data.success) {
                 console.error('Update failed:', data.message);
                 return { success: false, message: data.message };
             }
 
-            // Debug: Check what we're getting back
-            console.log('Updated product data:', data.data);
-            
-            // update the ui immediately, without needing a refresh
             set((state) => {
-                console.log('Current products before update:', state.products);
-                
                 const updatedProducts = state.products.map((product) => {
                     if (product._id === pid) {
-                        return data.data && typeof data.data === 'object' ? data.data : { ...product, ...updatedProduct };
+                        return data.data && typeof data.data === 'object'
+                            ? data.data
+                            : { ...product, ...updatedProduct };
                     }
                     return product;
                 });
-                
+
                 return { products: updatedProducts };
             });
 
             return { success: true, message: data.message };
         } catch (error) {
             console.error('Update product error:', error);
-            return { success: false, message: 'Failed to update product' };
+            return {
+                success: false,
+                message: 'Failed to update product',
+            };
         }
     },
 }));
