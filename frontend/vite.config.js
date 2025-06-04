@@ -7,8 +7,9 @@ export default defineConfig({
   server: {
     proxy: {
       '/api': {
-        target: 'https://mern-product-manager-api.vercel.app/api', // Adjust the target to your backend server
+        target:
+          'https://mern-product-manager-4xwwn706i-mohamed-cyber-hubs-projects.vercel.app/api', // Adjust the target to your backend server
       },
     },
   },
-})
+});
