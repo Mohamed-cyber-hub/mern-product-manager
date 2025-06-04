@@ -1,0 +1,1 @@
+export const backend_URL = 'https://mern-product-manager-api.vercel.app/api';
