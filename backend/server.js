@@ -10,7 +10,7 @@ const app = express();
 const PORT = process.env.PORT || 3000;
 
 app.use(cors({
-    origin: "https://mern-product-manager-frontend.vercel.app",
+    origin: "https://mern-product-manager-frontend-80r5pc07s.vercel.app",
 }));
 
 
