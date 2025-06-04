@@ -7,7 +7,7 @@ export default defineConfig({
   server: {
     proxy: {
       '/api': {
-        target: 'http://localhost:3000', // Adjust the target to your backend server
+        target: 'https://mern-product-manager-api.vercel.app/api', // Adjust the target to your backend server
       },
     },
   },
